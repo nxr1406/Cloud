@@ -1,0 +1,59 @@
+name: Generate Keystore
+
+on:
+  workflow_dispatch:
+    inputs:
+      key_alias:
+        description: 'Key Alias'
+        required: true
+        default: 'nxr-music-key'
+        
+      store_password:
+        description: 'Store Password'
+        required: true
+        default: 'ahahxxxahah'
+        
+      key_password:
+        description: 'Key Password'
+        required: true
+        default: 'ahahxxxahah'
+        
+      your_name:
+        description: 'Your Name'
+        required: true
+        default: 'RI Nirob Sarkar'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Generate Keystore
+        run: |
+          keytool -genkey -v \
+            -keystore release.jks \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -alias "${{ github.event.inputs.key_alias }}" \
+            -storepass "${{ github.event.inputs.store_password }}" \
+            -keypass "${{ github.event.inputs.key_password }}" \
+            -dname "CN=${{ github.event.inputs.your_name }}, O=Android, C=US"
+
+      - name: Convert to Base64
+        run: |
+          echo "====== KEYSTORE_BASE64 ======"
+          base64 -i release.jks | tr -d '\n'
+          echo ""
+          echo "=============================="
+
+      - name: Upload Keystore
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-keystore
+          path: release.jks
