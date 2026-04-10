@@ -6,7 +6,7 @@ on:
       key_alias:
         description: 'Key Alias'
         required: true
-        default: 'nxr-music-key'
+        default: 'nxr_linkup_alias
         
       store_password:
         description: 'Store Password'
